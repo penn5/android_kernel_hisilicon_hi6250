@@ -48,7 +48,7 @@
 #include <huawei_platform/power/huawei_charger.h>
 #include <linux/power/hisi/hisi_bci_battery.h>
 #include <linux/power/hisi/coul/hisi_coul_drv.h>
-#include <bq2560x_charger.h>
+#include "bq2560x_charger.h"
 #ifdef CONFIG_HUAWEI_USB_SHORT_CIRCUIT_PROTECT
 #include <huawei_platform/power/usb_short_circuit_protect.h>
 #endif
