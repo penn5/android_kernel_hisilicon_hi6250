@@ -2,3 +2,5 @@ obj-$(CONFIG_HW_ZEROHUNG)	+= zrhung_lastword.o zrhung_transtation.o zrhung_confi
 ifeq ($(CONFIG_ARCH_QCOM),)
 obj-$(CONFIG_HW_CGROUP_INFO) += cgroup_info.o
 endif
+
+ccflags-y += -Wno-error=incompatible-pointer-types
