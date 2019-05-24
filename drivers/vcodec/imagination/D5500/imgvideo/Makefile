@@ -56,11 +56,11 @@ obj-y := imgvideo.o
 ccflags-y += -g  -D__android__ -D__linux__ -D__ANDROID__ -DANDROID -D__PORT_FWRK__  -DSYSBRG_BRIDGING -DIMG_MEMALLOC_UNIFIED_VMALLOC -DPORTFWRK_SYSMEM_ION -DSECURE_TAL -DTARGET_SECURE_TAL -DTARGET_CONF_BY_HEADER_FILE -DION_BUFFERS -D__TALMMU_USE_SYSAPIS__ -D__TALMMU_NO_TAL__ -DIMG_KERNEL_MODULE
 ccflags-y +=  -I$(src)/../imgvideo/port_fwrk/include -I$(src)/../imgvideo/system/include -I$(src)/../imgvideo/list_utils/include -I$(src)/../imgvideo/secure_media/target/include -I$(src)/../imgvideo/include -I$(src)/../imgvideo/include/linux-kernel -I$(src)/../imgvideo/platform/include -I$(src)/../imgvideo/platform -I$(src)/../imgvideo/rpc/sysbrg/src -I$(src)/../imgvideo/port_fwrk/libraries/sysbrg/linux/code -I$(src)/../imgvideo/secure_media/tal/include -I$(src)/../imgvideo/kernel_comp/include -I$(src)/../imgvideo/osa/include -I$(src)/../imgvideo/imglib/libraries/listman/include -I$(src)/../imgvideo/imglib/libraries/talmmu_api/include -I$(src)/../imgvideo/imglib/libraries/cbman/include -I$(src)/../imgvideo/imglib/libraries/pixelapi/include -I$(src)/../imgvideo/imglib/libraries/pixelapi/code
 
-ifeq ($(wildcard linux/ion.h),)
-ccflags-y += -DIMG_KERNEL_ION_HEADER="<$(srctree)/drivers/staging/android/ion/ion.h>"
-else
+#ifeq ($(wildcard linux/ion.h),)
+#ccflags-y += -DIMG_KERNEL_ION_HEADER="<$(srctree)/drivers/staging/android/ion/ion.h>"
+#else
 ccflags-y += -DIMG_KERNEL_ION_HEADER="<linux/ion.h>"
-endif
+#endif
 
 ifneq ( ,$(findstring arm64,$(ARCH)))
 ccflags-y += -fno-pic
