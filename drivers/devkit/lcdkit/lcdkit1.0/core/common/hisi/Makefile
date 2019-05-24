@@ -15,4 +15,7 @@ EXTRA_CFLAGS += -Idrivers/video/fbdev/hisi/dss \
 		-Idrivers/devkit/lcdkit/lcdkit1.0/include \
 		-Idrivers/devkit/lcdkit/lcdkit1.0 \
 		-Idrivers/devkit/lcdkit/lcdkit1.0/core/common \
-		-Idrivers/devkit/tpkit
+		-Idrivers/devkit/tpkit \
+		-Idrivers/devkit/lcdkit/lcdkit1.0/include \
+		-Idrivers/devkit/lcdkit/lcdkit1.0/core/common/hisi \
+		-Wno-error=incompatible-pointer-types

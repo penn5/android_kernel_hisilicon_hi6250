@@ -17,6 +17,7 @@ obj-$(CONFIG_LCDKIT_DRIVER) += hisi/
 EXTRA_CFLAGS += -Idrivers/devkit/lcdkit/lcdkit1.0/core/common/hisi
 EXTRA_CFLAGS += -Idrivers/video/fbdev/hisi/dss
 EXTRA_CFLAGS += -Idrivers/staging/android
+EXTRA_CFLAGS += -Wno-error=incompatible-pointer-types
 $(info find lcdkit hisi folder, include it now!)
 endif
 

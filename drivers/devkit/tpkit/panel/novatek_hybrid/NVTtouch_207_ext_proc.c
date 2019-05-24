@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2010 - 2016 Novatek, Inc.
  *
@@ -27,7 +28,7 @@
 
 #include <asm/uaccess.h>
 #include <linux/delay.h>
-#include <../../huawei_ts_kit.h>
+#include "../../huawei_ts_kit.h"
 #include <linux/regulator/consumer.h>
 #include <huawei_platform/log/log_jank.h>
 #include "../../huawei_ts_kit_algo.h"

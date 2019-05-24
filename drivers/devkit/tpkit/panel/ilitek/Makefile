@@ -6,3 +6,4 @@ obj-$(CONFIG_ILITEK_TS_KIT) += ilitek_aim.o \
 EXTRA_CFLAGS += -Iarch/arm/mach-hisi
 EXTRA_CFLAGS += -Idrivers/hisi/tzdriver
 EXTRA_CFLAGS += -Idrivers/tzdriver
+EXTRA_CFLAGS += -Wno-error=incompatible-pointer-types

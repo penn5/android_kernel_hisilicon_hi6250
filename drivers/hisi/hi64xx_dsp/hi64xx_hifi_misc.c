@@ -50,8 +50,8 @@
 #include <dsm_audio/dsm_audio.h>
 #include <rdr_hisi_audio_codec.h>
 #include <rdr_hisi_audio_adapter.h>
-#include <hi64xx_algo_interface.h>
-#include <hi64xx_hifi_interface.h>
+#include "hi64xx_algo_interface.h"
+#include "hi64xx_hifi_interface.h"
 #include "hi64xx_hifi_debug.h"
 #include "hi64xx_hifi_img_dl.h"
 #include "slimbus.h"

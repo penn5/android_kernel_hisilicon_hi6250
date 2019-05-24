@@ -27,7 +27,7 @@
 #include <linux/stat.h>
 #include <linux/version.h>
 #include <linux/hisi/hi64xx/hi6403_dsp_regs.h>
-#include <hi64xx_hifi_interface.h>
+#include "hi64xx_hifi_interface.h"
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0))
 #include <uapi/linux/sched/types.h>
 #endif

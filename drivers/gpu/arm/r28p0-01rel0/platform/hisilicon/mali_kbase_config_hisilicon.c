@@ -679,9 +679,9 @@ static int kbase_platform_init(struct kbase_device *kbdev)
 
 #ifdef CONFIG_DEVFREQ_THERMAL
 	{
-		struct devfreq_cooling_ops *callbacks;
+		struct devfreq_cooling_power *callbacks;
 
-		callbacks = (struct devfreq_cooling_ops *)POWER_MODEL_CALLBACKS;
+		callbacks = (struct devfreq_cooling_power *)POWER_MODEL_CALLBACKS;
 
 		kbdev->devfreq_cooling = of_devfreq_cooling_register_power(
 				kbdev->dev->of_node,
