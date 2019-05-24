@@ -60,7 +60,6 @@ void hisifb_set_backlight(struct hisi_fb_data_type *hisifd, uint32_t bkl_lvl, bo
 			return;
 		}
 
-		hung_wp_screen_setbl(temp);
 		if (hisifd->backlight.bl_level_old == 0) {
 			HISI_FB_INFO("backlight level = %d \n", bkl_lvl);
 		}

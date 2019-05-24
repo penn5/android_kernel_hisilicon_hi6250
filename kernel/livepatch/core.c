@@ -350,24 +350,7 @@ static int klp_disable_func(struct klp_func *func)
 
 static int do_upload_log(long type,const char * desc)
 {
-	struct imonitor_eventobj *obj=NULL;
-	int ret = 0;
-
-	obj = imonitor_create_eventobj(KLP_PATCH_STATE_IMONITOR_ID);
-	if (obj) {
-		ret += imonitor_set_param(obj, E940000002_ERRTYPE_INT,type);
-		ret += imonitor_set_param(obj, E940000002_ERRDESC_VARCHAR,(long)desc);
-		if(ret){
-			imonitor_destroy_eventobj(obj);
-			return ret;
-		}
-		ret = imonitor_send_event(obj);
-		imonitor_destroy_eventobj(obj);
-	}
-	else {
-		ret = -1;
-	}
-	return ret;
+	return -1;
 }
 int __weak arch_klp_enable_func(struct klp_func *func)
 {

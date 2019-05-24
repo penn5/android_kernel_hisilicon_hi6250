@@ -25,7 +25,6 @@
 
 #ifdef CONFIG_ACM
 #include <linux/acm_f2fs.h>
-#include <log/log_usertype.h>
 #define ACM_PHOTO	1
 #define ACM_VIDEO	2
 #define ACM_PHOTO_HWBK	3
@@ -295,72 +294,6 @@ static int is_media_extension(const unsigned char *s, const char *sub)
 	return 0;
 }
 
-static int is_photo_file(struct dentry *dentry)
-{
-	static const char * const ext[] = { "jpg", "jpe", "jpeg", "gif", "png",
-					    "bmp", "wbmp", "webp", "dng", "cr2",
-					    "nef", "nrw", "arw", "rw2", "orf",
-					    "raf", "pef", "srw", "heic", "heif", NULL };
-	int i, ret = 0;
-
-	for (i = 0; ext[i]; i++) {
-		ret = is_media_extension(dentry->d_name.name, ext[i]);
-		if (ret == 1)
-			return ACM_PHOTO;
-		else if (ret == 2)
-			return ACM_PHOTO_HWBK;
-	}
-
-	return 0;
-}
-
-static int is_video_file(struct dentry *dentry)
-{
-	static const char * const ext[] = { "mpeg", "mpg", "mp4", "m4v",
-					    "mov",  "3gp", "3gpp", "3g2", "3gpp2",
-					    "mkv", "webm", "ts", "avi", "f4v",
-					    "flv", "m2ts", "divx", "rm", "rmvb",
-					    "wmv", "asf", "rv", "rmhd", NULL };
-	int i, ret = 0;
-
-	for (i = 0; ext[i]; i++) {
-		ret = is_media_extension(dentry->d_name.name, ext[i]);
-		if (ret == 1)
-			return ACM_VIDEO;
-		else if (ret == 2)
-			return ACM_VIDEO_HWBK;
-	}
-
-	return 0;
-}
-
-static int should_monitor_file(struct dentry *dentry)
-{
-	struct inode *i = d_inode(dentry);
-	struct dentry *d;
-	int file_type = 0;
-
-	if (!S_ISREG(i->i_mode))
-		return 0;
-
-	/* check if parent directory is set with FS_UNRM_FL */
-	d = dget_parent(dentry);
-	i = d_inode(d);
-
-	if ((F2FS_I(i)->i_flags & F2FS_UNRM_PHOTO_FL)){
-		file_type = is_photo_file(dentry);
-		if (file_type)
-			goto out;
-	}
-
-	if ((F2FS_I(i)->i_flags & F2FS_UNRM_VIDEO_FL))
-		file_type = is_video_file(dentry);
-
-out:
-	dput(d);
-	return file_type;
-}
-
 static void inherit_parent_flag(struct inode *dir, struct inode *inode)
 {
 	if (!S_ISDIR(inode->i_mode))
@@ -371,25 +304,7 @@ static void inherit_parent_flag(struct inode *dir, struct inode *inode)
 	if (F2FS_I(dir)->i_flags & F2FS_UNRM_VIDEO_FL)
 		F2FS_I(inode)->i_flags |= F2FS_UNRM_VIDEO_FL;
 }
-
-static void get_real_pkg_name(char *pkgname, int len)
-{
-	int i;
-
-	pkgname[len - 1] = '\0';
-	for (i = 0; i < len && pkgname[i] != '\0'; i++) {
-		if (pkgname[i] == ':') {
-			pkgname[i] = '\0';
-			break;
-		}
-	}
-}
 #endif
-
-static bool is_log_file(const char *filename)
-{
-	return is_extension_exist(filename, "log");
-}
 
 static int f2fs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 						bool excl)
@@ -415,8 +330,6 @@ static int f2fs_create(struct inode *dir, struct dentry *dentry, umode_t mode,
 
 	if (!test_opt(sbi, DISABLE_EXT_IDENTIFY))
 		set_file_temperature(sbi, inode, dentry->d_name.name);
-	if (is_log_file(dentry->d_name.name))
-		set_inode_flag(inode, FI_LOG_FILE);
 
 	inode->i_op = &f2fs_file_inode_operations;
 	inode->i_fop = &f2fs_file_operations;
@@ -634,8 +547,6 @@ static struct dentry *f2fs_lookup(struct inode *dir, struct dentry *dentry,
 		goto out_iput;
 	}
 
-	if (is_log_file(dentry->d_name.name))
-		set_inode_flag(inode, FI_LOG_FILE);
 	if (!test_opt(sbi, DISABLE_EXT_IDENTIFY) && !file_is_cold(inode))
 		set_file_temperature(sbi, inode, dentry->d_name.name);
 out_splice:
@@ -662,9 +573,6 @@ static int f2fs_unlink(struct inode *dir, struct dentry *dentry)
 	struct inode *inode = d_inode(dentry);
 	struct f2fs_dir_entry *de;
 	struct page *page;
-#ifdef CONFIG_ACM
-	int logusertype = get_logusertype_flag();
-#endif
 	int err = -ENOENT;
 
 	trace_f2fs_unlink_enter(dir, dentry);
@@ -678,98 +586,6 @@ static int f2fs_unlink(struct inode *dir, struct dentry *dentry)
 	err = f2fs_dquot_initialize(inode);
 	if (err)
 		return err;
-
-
-#ifdef CONFIG_ACM
-	/* oversea users do not need monitor*/
-	if (logusertype != OVERSEA_USER && logusertype != OVERSEA_COMMERCIAL_USER) {
-		struct task_struct *tsk, *p_tsk = NULL, *pp_tsk = NULL;
-		struct dentry *dent;
-		char *pkg;
-		uid_t uid;
-		int is_dir = S_ISDIR(inode->i_mode);
-		char *event;
-		char *envp[2];
-		int file_type = should_monitor_file(dentry);
-
-		if (file_type) {
-			tsk = current->group_leader;
-			if (!tsk) {
-				err = -EINVAL;
-				goto fail;
-			}
-			if (tsk->parent == NULL)
-				goto always_report;
-			p_tsk = tsk->parent->group_leader;
-			if (!p_tsk || p_tsk->parent == NULL)
-				goto always_report;
-			pp_tsk = p_tsk->parent->group_leader;
-always_report:
-			if (is_dir)
-				dent = dentry;
-			else
-				dent = dentry->d_parent;
-			event = kmalloc(300UL, GFP_NOFS);
-			if (event) {
-				scnprintf(event, 299UL, "UNLINK=%s@%s@%s@%s@%d",
-						tsk->comm,
-						p_tsk ? p_tsk->comm : "null",
-						pp_tsk ? pp_tsk->comm : "null",
-						dent->d_name.name, is_dir);
-				envp[0] = event;
-				envp[1] = NULL;
-				err = kobject_uevent_env(&sbi->s_kobj, KOBJ_CHANGE, envp);
-				kfree(event);
-				if (err == -ENOMEM)
-					goto fail;
-				else if (err)
-					pr_err("F2FS-fs: %s: failed to send uevent err %d\n",
-							__func__, err);
-			} else {
-				err = -ENOMEM;
-				goto fail;
-			}
-
-			pkg = (char *)kzalloc(100, GFP_NOFS);
-			if(!pkg) {
-				err = -ENOMEM;
-				goto fail;
-			}
-			/* When the task's uid is not more than 10000,get pakege name and uid directly.
-				Otherwise,find it's parent until the uid of it's parent is less than 10000 */
-			if (__kuid_val(task_uid(tsk)) >= 10000) {
-				p_tsk = tsk;
-				while ( __kuid_val(task_uid(p_tsk)) >= 10000) {
-					if ((p_tsk->real_parent) != NULL) {
-						tsk = p_tsk;
-						p_tsk = p_tsk->real_parent->group_leader;
-					} else {
-						break;
-					}
-				}
-			}
-			get_cmdline(tsk, pkg, 100);
-			get_real_pkg_name(pkg, 100);
-			uid = __kuid_val(task_uid(tsk));
-
-			pr_err("F2FS-fs: %s: dentry %pd PID %d cmdline %s uid %d\n",
-				__func__, dentry, task_pid_nr(tsk), pkg, uid);
-			if (acm_search(pkg, dentry, uid, file_type) != 0) {
-				if ((file_type == ACM_PHOTO) ||
-				    (file_type == ACM_VIDEO)) {
-					err = -EOWNERDEAD;
-				} else if ((file_type == ACM_PHOTO_HWBK) ||
-					   (file_type == ACM_VIDEO_HWBK)) {
-					err = -EACCES;
-				}
-				kfree(pkg);
-				goto fail;
-			}
-			kfree(pkg);
-		}
-	}
-#endif
-
 	de = f2fs_find_entry(dir, &dentry->d_name, &page);
 	if (!de) {
 		if (IS_ERR(page))

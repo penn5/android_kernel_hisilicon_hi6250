@@ -11,8 +11,6 @@
 #include "hi64xx_hifi_debug.h"
 #include "hi64xx_hifi_om.h"
 #include "hi64xx_hifi_misc.h"
-#include "huawei_platform/log/imonitor.h"
-#include "huawei_platform/log/imonitor_keys.h"
 
 
 /*lint -e655 -e838 -e730 -e754 -e747 -e731*/
@@ -178,32 +176,7 @@ void anc_beta_generate_path(hook_pos pos, const char *base_path, char *full_path
 
 int anc_beta_log_upload(void* data)
 {
-	MLIB_ANC_DFT_INFO *info = (MLIB_ANC_DFT_INFO *)data;
-	struct imonitor_eventobj *obj;
-	unsigned int event_id;
-	int ret;
-
-	event_id = CODEC_DSP_ANC_ERR_BASE_ID + info->err_class;
-	obj = imonitor_create_eventobj(event_id);
-
-	imonitor_set_param(obj, EVENTLEVEL, info->err_level);
-	if (voice_record_permission) {
-		imonitor_set_param(obj, EVENTMODULE, (long)"ANC_inc_voice");
-	} else {
-		imonitor_set_param(obj, EVENTMODULE, (long)"ANC_no_voice");
-	}
-	if (LOW_ACTTIME_RATE == info->err_class) {
-		imonitor_set_param(obj, E916000004_PROBABILITY_TINYINT, *(unsigned int *)(info->details + 24));
-	}
-	if (PROCESS_PATH_ERR == info->err_class) {
-		char   rsn[8] = {0};
-		snprintf(rsn, 7, "%d", *(unsigned int *)(info->details + 28));
-		imonitor_set_param(obj, E916000005_CAUSECASE_VARCHAR, (long)rsn);
-	}
-	ret = imonitor_send_event(obj);
-	imonitor_destroy_eventobj(obj);
-
-	return ret;
+	return -1;
 }
 
 int dsm_beta_dump_file(void* data, bool create_dir)
@@ -228,34 +201,7 @@ int dsm_beta_dump_file(void* data, bool create_dir)
 
 int dsm_beta_log_upload(void* data)
 {
-	MLIB_DSM_DFT_INFO *info = (MLIB_DSM_DFT_INFO *)data;
-	struct imonitor_eventobj *obj;
-	unsigned int event_id;
-	Dsm_adp_statistics *dsm_info;
-	int ret;
-
-	event_id = CODEC_DSP_SMARTPA_ERR_BASE_ID + info->errClass;
-	obj = imonitor_create_eventobj(event_id);
-	imonitor_set_param(obj, E916000101_EVENTLEVEL_INT, info->errLevel);
-	imonitor_set_param(obj, E916000101_EVENTMODULE_VARCHAR, (long)"SmartPa");
-	if (DSM_OM_ERR_TYPE_PROC == info->errClass) {
-		dsm_info = (Dsm_adp_statistics *)info->errInfo;
-		imonitor_set_param(obj, E916000101_ERRCODE_INT, info->errCode);
-		imonitor_set_param(obj, E916000101_MAXRDC_INT, dsm_info->maxRdcQ27);
-		imonitor_set_param(obj, E916000101_MINRDC_INT, dsm_info->minRdcQ27);
-		imonitor_set_param(obj, E916000101_MAXTEMP_INT, dsm_info->maxTempQ19);
-		imonitor_set_param(obj, E916000101_MINTEMP_INT, dsm_info->minTempQ19);
-		imonitor_set_param(obj, E916000101_MAXAMP_INT, dsm_info->maxExcurQ27);
-		imonitor_set_param(obj, E916000101_MINAMP_INT, dsm_info->minExcurQ27);
-	} else {
-		char   numStr[8] = {0};
-		snprintf(numStr, 7, "%d", info->errLineNum);
-		imonitor_set_param(obj, E916000102_ERRPOSTAG_VARCHAR, (long)numStr);
-	}
-	ret = imonitor_send_event(obj);
-	imonitor_destroy_eventobj(obj);
-
-	return ret;
+	return -1;
 }
 
 int virtual_btn_beta_dump_file(const void* data, unsigned int len, bool create_dir)
@@ -273,41 +219,6 @@ int virtual_btn_beta_dump_file(const void* data, unsigned int len, bool create_d
 
 int virtual_btn_beta_log_upload(VITRUAL_BNT_DATA_LOG *info)
 {
-	struct imonitor_eventobj *obj;
-	unsigned int event_id;
-	int ret;
-	int i;
-
-	event_id = VIRTUAL_BTN_INFO_EVENT_ID;
-	obj = imonitor_create_eventobj(event_id);
-	if (!obj) {
-		HI64XX_DSP_ERROR("virtual btn imonitor create eventobj error\n");
-		return -1;
-	}
-	imonitor_set_param_integer_v2(obj, "btn_num", (long)info->btn_num);
-	imonitor_set_param_integer_v2(obj, "passive_num", (long)info->passive_num);
-	imonitor_set_param_integer_v2(obj, "active_num", (long)info->active_num);
-	for (i = 0; i < VIRTUAL_BTN_MSG_NUM; i++) {
-		if (VIRTUAL_BTN_PRESS_UP_FLAG == info->data_log[i][VIRTBTN_PRESS_UP]) {
-			break;
-		}
-	}
-	if (i < VIRTUAL_BTN_MSG_NUM) {
-		imonitor_set_param_integer_v2(obj, "fitting_linearity", (long)info->data_log[i][VIRTBTN_FITTING_LINEARITY]);
-		imonitor_set_param_integer_v2(obj, "data_ult_baseline", (long)info->data_log[i][VIRTBTN_DATA_ULT_BASELINE]);
-		imonitor_set_param_integer_v2(obj, "slope_intercept", (long)info->data_log[i][VIRTBTN_SLOPE_INTERCEPT]);
-		imonitor_set_param_integer_v2(obj, "freq_scan", (long)info->data_log[i][VIRTBTN_FREQ_SCAN]);
-	} else {
-		imonitor_set_param_integer_v2(obj, "fitting_linearity", 0);
-		imonitor_set_param_integer_v2(obj, "data_ult_baseline", 0);
-		imonitor_set_param_integer_v2(obj, "slope_intercept", 0);
-		imonitor_set_param_integer_v2(obj, "freq_scan", 0);
-	}
-	ret = imonitor_send_event(obj);
-	if (ret < 0)
-		HI64XX_DSP_ERROR("virtual btn imonitor send event fail %d\n", ret);
-	imonitor_destroy_eventobj(obj);
-
-	return ret;
+	return -1;
 }
 

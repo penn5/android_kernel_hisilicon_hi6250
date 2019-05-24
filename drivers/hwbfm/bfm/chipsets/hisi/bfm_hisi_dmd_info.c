@@ -23,8 +23,6 @@
 #include <asm/uaccess.h>
 #include <linux/list.h>
 
-#include <log/log_usertype.h>
-
 #define ERROR_NO "[Error no]:"
 
 #define MAXSIZES 256
@@ -340,16 +338,8 @@ static int count_dmd_file(struct list_head* plistHead) {
     char* dmdPath_0 = NULL;
     char* dmdPath_1 = NULL;
 
-    unsigned int type = get_logusertype_flag();
-
-    if (type == BETA_USER) {
-        dmdPath_0 = B_DMD_PATH_0;
-        dmdPath_1 = B_DMD_PATH_1;
-    }
-    else {
-        dmdPath_0 = DMD_PATH_0;
-        dmdPath_1 = DMD_PATH_1;
-    }
+    dmdPath_0 = DMD_PATH_0;
+    dmdPath_1 = DMD_PATH_1;
 
     fp0 = filp_open(dmdPath_0, O_RDONLY, 0);
     if (IS_ERR(fp0)) {

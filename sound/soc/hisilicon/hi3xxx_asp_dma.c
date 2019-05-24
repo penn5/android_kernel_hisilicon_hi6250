@@ -990,25 +990,6 @@ static void  hi3xxx_asp_dmac_monitor_work_handle(struct work_struct *work)
 	} else {
 		triggerSendEvent = false;
 	}
-
-	if (triggerSendEvent) {
-		struct imonitor_eventobj *pEventObj;
-		pEventObj = imonitor_create_eventobj(916010502);
-		if (pEventObj) {
-			imonitor_set_param(pEventObj, 0 /*EXCEPTION_EEVENTLEVEL_INT*/, (long)3 /*MEDIA_LOG_ERROR*/);
-			imonitor_set_param(pEventObj, 1 /*EXCEPTION_SUBTYPE_INT*/, (long)0);
-			imonitor_set_param(pEventObj, 2 /*EXCEPTION_REASON_VARCHAR*/, (long)"dma period err");
-			imonitor_set_param(pEventObj, 4 /*EXCEPTION_COUNT_INT*/, (long)dmaPeriodErrCount);
-			imonitor_set_param(pEventObj, 5 /*EXCEPTION_PARAINT_INT*/, (long)dmaPeriodIntervalMs);
-			imonitor_send_event(pEventObj);
-			imonitor_destroy_eventobj(pEventObj);
-			//reset count and state
-			pr_err("trigger_monitor_dma_exception %d \n", dmaPeriodErrCount);
-			dmaPeriodErrCount = 0;
-			dmaPeriodIntervalMs = 0;
-			triggerSendEvent = false;
-		}
-	}
 }
 #endif
 

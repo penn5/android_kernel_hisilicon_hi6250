@@ -63,7 +63,6 @@
 #define BBIITT_USB_HEADSET_PRENAME "BBIITT USB-C"
 #define USB_AUDIO_TYPEC_INFO_EVENT_ID 931001000
 
-static unsigned int insert_times;
 static DEFINE_MUTEX(connect_mutex);
 static DEFINE_MUTEX(usbaudio_wakeup_mutex);
 struct usbaudio_dsp_client_ops {
@@ -303,33 +302,7 @@ void usbaudio_ctrl_query_info(struct usbaudio_info *usbinfo)
 
 static int usbaudio_ctrl_typeC_log_upload(void *data)
 {
-	struct snd_usb_audio *info = NULL;
-	struct imonitor_eventobj *obj = NULL;
-	int ret = -1;
-	if(!data){
-		pr_err("headset info is null!\n");
-		return ret;
-	}
-	info = (struct snd_usb_audio *)data;
-	insert_times++;
-	pr_info("typeC headset bcdDevice %0x, times %d\n",info->dev->descriptor.bcdDevice, insert_times);
-
-	obj = imonitor_create_eventobj(USB_AUDIO_TYPEC_INFO_EVENT_ID);
-	if(!obj){
-		pr_err("imonitor create eventobj error\n");
-		return ret;
-	}
-	imonitor_set_param_integer_v2(obj, "usbid", info->usb_id);
-	imonitor_set_param_string_v2(obj, "IC", info->dev->manufacturer);
-	imonitor_set_param_string_v2(obj, "module", info->card->shortname);
-	imonitor_set_param_string_v2(obj, "isn", info->dev->serial);
-	imonitor_set_param_integer_v2(obj, "times", insert_times);
-	imonitor_set_param_integer_v2(obj, "ver", info->dev->descriptor.bcdDevice);
-	ret = imonitor_send_event(obj);
-	if(obj){
-		imonitor_destroy_eventobj(obj);
-	}
-	return ret;
+	return -1;
 }
 void usbaudio_ctrl_set_chip(struct snd_usb_audio *chip)
 {

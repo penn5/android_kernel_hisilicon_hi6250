@@ -224,8 +224,6 @@ source "drivers/dsm/Kconfig"
 
 source "drivers/wpa_dmd/Kconfig"
 
-source "drivers/log/Kconfig"
-
 source "drivers/connectivity/Kconfig"
 
 source "drivers/contexthub/Kconfig"

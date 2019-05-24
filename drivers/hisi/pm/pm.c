@@ -72,7 +72,6 @@ static unsigned int tickmark_s = 0;
 static unsigned int tickmark_r = 0;
 static unsigned int resume_time_ms = 0;
 
-#include <log/log_usertype.h>
 unsigned long g_latt_wakeuptime = 0;
 const char *g_latt_sourcename = NULL;
 int  g_latt_gpio = 0;
@@ -167,13 +166,6 @@ void pm_gic_pending_dump(void)
 				if (gpio >= 0) {
 					printk("(gpio-%d)", gpio);
                 }
-				/* notify dubai module to update wakeup information */
-				dubai_update_wakeup_info(g_ap_irq_name[irq], gpio);
-                                if (BETA_USER == get_logusertype_flag()) {
-                                          g_latt_wakeuptime = hisi_getcurtime() / 1000000;
-                                          g_latt_sourcename = g_ap_irq_name[irq];
-                                          g_latt_gpio = gpio;
-                                }
 				printk("\n");
 			}
 		}

@@ -28,7 +28,6 @@
 #include <asm/io.h>
 #include <chipset_common/bfmr/public/bfmr_public.h>
 #include <chipset_common/bfmr/common/bfmr_common.h>
-#include <log/log_usertype.h>
 
 
 /*----local macroes------------------------------------------------------------------*/
@@ -1085,41 +1084,15 @@ char* bfm_get_boot_stage_name(unsigned int boot_stage)
     return boot_stage_name;
 }
 
-
-static unsigned int bfm_get_version_type(void)
-{
-	int i;
-	unsigned int user_flag = 0;
-
-	if (s_is_first_get_usertype) {
-		for (i = 0; i < BFM_HISI_WAIT_FOR_VERSION_PART_TIMEOUT; i++) {
-			user_flag = get_logusertype_flag();
-			if (user_flag != 0)
-				break;
-			msleep(1000);
-		}
-		s_is_first_get_usertype = false;
-	} else {
-		user_flag = get_logusertype_flag();
-	}
-
-	return user_flag;
-}
-
-
 bool bfm_is_beta_version(void)
 {
-    unsigned int usertype = bfm_get_version_type();
-
-    return ((BETA_USER == usertype) || (OVERSEA_USER == usertype));
+    return false;
 }
 
 
 bool bfmr_is_oversea_commercail_version(void)
 {
-    unsigned int usertype = bfm_get_version_type();
-
-    return ((BETA_USER != usertype) && (OVERSEA_USER != usertype) && (COMMERCIAL_USER != usertype));
+    return false;
 }
 
 

@@ -27,7 +27,6 @@
 #include <linux/cpumask.h>
 
 
-#include <huawei_platform/log/imonitor.h>
 #define IMONITOR_TA_CRASH_EVENT_ID      (901002003)
 #include "securec.h"
 #include "tc_ns_log.h"
@@ -1582,35 +1581,9 @@ int init_smc_svc_thread(void)
 /*lint -e838*/
 int teeos_log_exception_archive(unsigned int eventid,const char* exceptioninfo)
 {
-	int ret;
-	struct imonitor_eventobj *teeos_obj = NULL;
-
-	teeos_obj = imonitor_create_eventobj(eventid);
-	if ( exceptioninfo!=NULL ) {
-	    ret = imonitor_set_param(teeos_obj, 0, (long)exceptioninfo);
-	} else {
-	    ret = imonitor_set_param(teeos_obj, 0, (long)"teeos something crash");
-	}
-	if (0 != ret){
-		tloge("imonitor_set_param failed\n");
-		imonitor_destroy_eventobj(teeos_obj);
-		return ret;
-	}
-	ret = imonitor_add_dynamic_path(teeos_obj, "/data/vendor/log/hisi_logs/tee");
-	if (0 != ret) {
-		tloge("add path  failed\n");
-		imonitor_destroy_eventobj(teeos_obj);
-		return ret;
-	}
-	ret = imonitor_add_dynamic_path(teeos_obj, "/data/log/tee");
-	if (0 != ret) {
-		tloge("add path  failed\n");
-		imonitor_destroy_eventobj(teeos_obj);
-		return ret;
-	}
-	ret = imonitor_send_event(teeos_obj);
-	imonitor_destroy_eventobj(teeos_obj);
-	return ret;
+	printk(KERN_ERR, "teeos something crashed!!! %d");
+	printk(KERN_ERR, exceptioninfo);
+	return -1;
 }
 
 void smc_free_data(void)

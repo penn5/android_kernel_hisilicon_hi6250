@@ -43,8 +43,6 @@
 #include <linux/version.h>
 #if KERNEL_VERSION(4, 14, 0) <= LINUX_VERSION_CODE
 #include <linux/delayacct.h>
-#else
-#include <log/log_usertype.h>
 #endif
 #include "../drivers/hisi/tzdriver/libhwsecurec/securec.h"
 
@@ -400,7 +398,7 @@ module_param_named(debug_enable, ws_debug_enable, bool, S_IRUSR | S_IWUSR);
 #else
 #define ws_dbg(x...) \
 	do { \
-		if (ws_debug_enable || (get_logusertype_flag() == BETA_USER)) \
+		if (ws_debug_enable) \
 			pr_info(x); \
 	} while (0)
 #endif
