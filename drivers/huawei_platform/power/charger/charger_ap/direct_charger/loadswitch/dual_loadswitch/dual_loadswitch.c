@@ -24,7 +24,7 @@
 #include <linux/slab.h>
 
 #include <huawei_platform/log/hw_log.h>
-#include <dual_loadswitch.h>
+#include "dual_loadswitch.h"
 
 #define HWLOG_TAG dual_loadswitch
 HWLOG_REGIST();
