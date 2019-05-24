@@ -21,6 +21,8 @@ ccflags-y += -DFSC_HAVE_ACCMODE
 ccflags-y += -DFSC_HAVE_VDM
 ccflags-y += -DFSC_HAVE_DP
 
+ccflags-y += -Wno-error=incompatible-pointer-types
+
 obj-y     += fusb30x_whole.o
 fusb30x_whole-objs         := Platform_Linux/fusb30x_driver.o \
 					  Platform_Linux/fusb30x_global.o \

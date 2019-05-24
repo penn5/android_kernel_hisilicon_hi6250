@@ -31,9 +31,9 @@
 #include <linux/module.h>
 #include <linux/dma-mapping.h>
 
-#include <hicam_buf.h>
-#include <cam_log.h>
-#include <hicam_buf_priv.h>
+#include "hicam_buf.h"
+#include "cam_log.h"
+#include "hicam_buf_priv.h"
 
 struct hicam_buf_device {
 	struct miscdevice dev;

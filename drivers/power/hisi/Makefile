@@ -9,3 +9,4 @@ CFLAGS_KERNEL += -DCONFIG_HLTHERM_RUNTEST
 endif
 
 EXTRA_CFLAGS += -Idrivers/hisi/tzdriver/libhwsecurec/
+EXTRA_CFLAGS += -Wno-error=incompatible-pointer-types

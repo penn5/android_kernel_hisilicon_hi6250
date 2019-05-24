@@ -12,4 +12,5 @@ EXTRA_CFLAGS += -I$(LCD_EFFECT_DIR)/drivers/huawei_platform/lcd \
 		-Idrivers/staging/android \
 		-Idrivers/atfdriver \
 		-Idrivers/hisi/tzdriver\
-                -Idrivers/hisi/tzdriver/libhwsecurec
+                -Idrivers/hisi/tzdriver/libhwsecurec \
+		-Wno-error=incompatible-pointer-types
