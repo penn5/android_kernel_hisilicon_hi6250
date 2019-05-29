@@ -212,6 +212,5 @@ obj-$(CONFIG_HW_CPULOAD_NOTI) += cpuload/
 obj-$(CONFIG_HW_MEMORY_MONITOR) += mmonitor/
 obj-$(CONFIG_HW_MEMORY_MONITOR) += allocpages_delayacct/
 obj-y += cfi/
-obj-$(CONFIG_HUAWEI_DUBAI) += dubai/
 obj-$(CONFIG_HUAWEI_STORAGE_ROFA) += storage_rofa/
 obj-$(CONFIG_OASES) += oases/
