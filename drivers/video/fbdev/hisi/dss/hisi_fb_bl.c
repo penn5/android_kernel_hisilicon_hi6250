@@ -14,8 +14,6 @@
 #include "hisi_fb.h"
 #include <linux/leds.h>
 
-#include <chipset_common/hwzrhung/hung_wp_screen.h>
-
 #define K3_DSS_SBL_WORKQUEUE	"k3_dss_sbl_workqueue"
 
 static int lcd_backlight_registered;

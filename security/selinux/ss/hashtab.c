@@ -7,10 +7,7 @@
 #include <linux/slab.h>
 #include <linux/errno.h>
 #include <linux/sched.h>
-#include <linux/pmalloc.h>
 #include "hashtab.h"
-
-extern struct gen_pool *selinux_pool;
 
 struct hashtab *hashtab_create(u32 (*hash_value)(struct hashtab *h, const void *key),
 			       int (*keycmp)(struct hashtab *h, const void *key1, const void *key2),
@@ -19,7 +16,7 @@ struct hashtab *hashtab_create(u32 (*hash_value)(struct hashtab *h, const void *
 	struct hashtab *p;
 	u32 i;
 
-	p = pzalloc(selinux_pool, sizeof(*p), GFP_KERNEL);
+	p = kzalloc(sizeof(*p), GFP_KERNEL);
 	if (p == NULL)
 		return p;
 
@@ -27,10 +24,9 @@ struct hashtab *hashtab_create(u32 (*hash_value)(struct hashtab *h, const void *
 	p->nel = 0;
 	p->hash_value = hash_value;
 	p->keycmp = keycmp;
-	p->htable = pmalloc(selinux_pool, sizeof(*(p->htable)) * size,
-			    GFP_KERNEL);
+	p->htable = kmalloc(sizeof(*(p->htable)) * size, GFP_KERNEL);
 	if (p->htable == NULL) {
-		pfree(selinux_pool, p);
+		kfree(p);
 		return NULL;
 	}
 
@@ -61,7 +57,7 @@ int hashtab_insert(struct hashtab *h, void *key, void *datum)
 	if (cur && (h->keycmp(h, key, cur->key) == 0))
 		return -EEXIST;
 
-	newnode = pzalloc(selinux_pool, sizeof(*newnode), GFP_KERNEL);
+	newnode = kzalloc(sizeof(*newnode), GFP_KERNEL);
 	if (newnode == NULL)
 		return -ENOMEM;
 	newnode->key = key;
@@ -110,15 +106,15 @@ void hashtab_destroy(struct hashtab *h)
 		while (cur) {
 			temp = cur;
 			cur = cur->next;
-			pfree(selinux_pool, temp);
+			kfree(temp);
 		}
 		h->htable[i] = NULL;
 	}
 
-	pfree(selinux_pool, h->htable);
+	kfree(h->htable);
 	h->htable = NULL;
 
-	pfree(selinux_pool, h);
+	kfree(h);
 }
 
 int hashtab_map(struct hashtab *h,

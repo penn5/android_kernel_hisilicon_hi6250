@@ -94,8 +94,7 @@ static struct shash_desc *init_desc(char type)
 		mutex_lock(&mutex);
 		if (*tfm)
 			goto out;
-		*tfm = crypto_alloc_shash(algo, 0,
-					  CRYPTO_ALG_ASYNC | CRYPTO_NOLOAD);
+		*tfm = crypto_alloc_shash(algo, 0, CRYPTO_ALG_ASYNC);
 		if (IS_ERR(*tfm)) {
 			rc = PTR_ERR(*tfm);
 			pr_err("Can not allocate %s (reason: %ld)\n", algo, rc);
